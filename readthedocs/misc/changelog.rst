@@ -13,6 +13,183 @@ it can take advantage of new goodies!
 
 .. contents:: List of All Versions
 
+New layer (v1.36)
+=================
+
++------------------------+
+| Scheme layer used: 181 |
++------------------------+
+
+`View new and changed raw API methods <https://diff.telethon.dev/?from=178&to=181>`__.
+
+Bug fixes
+~~~~~~~~~
+
+* Certain updates, such as :tl:`UpdateBotStopped`, should now be processed reliably.
+
+
+New layer (v1.35)
+=================
+
++------------------------+
+| Scheme layer used: 178 |
++------------------------+
+
+`View new and changed raw API methods <https://diff.telethon.dev/?from=173&to=178>`__.
+
+Additions
+~~~~~~~~~
+
+* ``drop_author`` parameter now exposed in ``forward_messages``.
+
+Enhancements
+~~~~~~~~~~~~
+
+* "Custom secret support" should work with ``TcpMTProxy``.
+* Some type hints should now be more accurate.
+
+Bug fixes
+~~~~~~~~~
+
+* Session path couldn't be a ``pathlib.Path`` or ``None``.
+* Python versions older than 3.9 should now be supported again.
+* Readthedocs should hopefully build the v1 documentation again.
+
+
+New layer (v1.34)
+=================
+
++------------------------+
+| Scheme layer used: 173 |
++------------------------+
+
+`View new and changed raw API methods <https://diff.telethon.dev/?from=167&to=173>`__.
+
+Additions
+~~~~~~~~~
+
+* ``reply_to_chat`` and ``reply_to_sender`` are now in ``Message``.
+  This is useful when you lack access to the chat, but Telegram still included some basic information.
+
+Bug fixes
+~~~~~~~~~
+
+* ``parse_mode`` with a custom instance containing both ``parse`` and ``unparse`` should now work.
+* Parsing and unparsing message entities should now behave better in certain corner-cases.
+
+
+New layer (v1.33)
+=================
+
++------------------------+
+| Scheme layer used: 167 |
++------------------------+
+
+`View new and changed raw API methods <https://diff.telethon.dev/?from=166&to=167>`__.
+
+Enhancements
+~~~~~~~~~~~~
+
+* ``webbrowser`` is now imported conditionally, to support niche environments.
+* Library should now retry on the suddenly-common ``TimedOutError``.
+
+Bug fixes
+~~~~~~~~~
+
+* Sending photos which were automatically resized should work again (included in the v1.32 series).
+
+
+New layer (v1.32)
+=================
+
++------------------------+
+| Scheme layer used: 166 |
++------------------------+
+
+`View new and changed raw API methods <https://diff.telethon.dev/?from=165&to=166>`__.
+
+This enables you to use custom languages in preformatted blocks using HTML:
+
+.. code-block:: html
+
+  <pre>
+    <code class='language-python'>from telethon import TelegramClient</code>
+  </pre>
+
+Note that Telethon v1's markdown is a custom format and won't support language tags.
+If you want to set a custom language, you have to use HTML or a custom formatter.
+
+
+Dropped imghdr support (v1.31)
+==============================
+
++------------------------+
+| Scheme layer used: 165 |
++------------------------+
+
+This release contains a breaking change in preparation for Python 3.12.
+If you were sending photos from in-memory ``bytes`` or ``BytesIO`` containing images,
+you should now use ``BytesIO`` and set the ``.name`` property to a dummy name.
+This will allow Telethon to detect the correct extension (and file type).
+
+.. code-block:: python
+
+    # before
+    image_data = b'...'
+    client.send_file(chat, image_data)
+
+    # after
+    from io import BytesIO
+    image_data = BytesIO(b'...')
+    image_data.name = 'a.jpg'  # any name, only the extension matters
+    client.send_file(chat, image_data)
+
+
+Bug fixes
+~~~~~~~~~
+
+* Code generation wasn't working under PyPy.
+* Obtaining markdown or HTML from message text could produce unexpected results sometimes.
+* Other fixes for bugs from the previous version, which were already fixed in patch versions.
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+* ``imghdr`` is deprecated in newer Python versions, so Telethon no longer uses it.
+  This means there might be some cases where Telethon fails to infer the file extension for buffers containing images.
+  If you were relying on this, add ``.name = 'a.jpg'`` (or other extension) to the ``BytesIO`` buffers you upload.
+
+Layer bump and small changes (v1.30)
+====================================
+
++------------------------+
+| Scheme layer used: 162 |
++------------------------+
+
+Some of the bug fixes were already present in patch versions of ``v1.29``, but
+the new layer necessitated a minor bump.
+
+Enhancements
+~~~~~~~~~~~~
+
+* Removed client-side checks for editing messages.
+  This only affects ``Message.edit``, as ``client.edit_message`` already had
+  no checks.
+* Library should not understand more server-side errors during update handling
+  which should reduce crashes.
+* Client-side image compression should behave better now.
+
+Bug fixes
+~~~~~~~~~
+
+* Some updates such as ``UpdateChatParticipant`` were being missed due to the
+  order in which Telegram sent them. The library now more carefully checks for
+  the sequence and pts contained in them to avoid dropping them.
+* Fixed ``is_inline`` check for :tl:`KeyboardButtonWebView`.
+* Fixed some issues getting entity from cache by ID.
+* ``reply_to`` should now work when sending albums.
+
+
 More bug fixing (v1.29)
 =======================
 
